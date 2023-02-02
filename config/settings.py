@@ -38,7 +38,7 @@ SLACK_BOT_USER_TOKEN = env('SLACK_BOT_USER_TOKEN')
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'a9f0-240b-250-8900-b600-75f8-b88c-f9b3-fc1.jp.ngrok.io']
+    'gunicorn-django']
 
 
 # Application definition
