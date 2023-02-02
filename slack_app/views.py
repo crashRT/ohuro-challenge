@@ -3,7 +3,13 @@ from django.http import HttpRequest, HttpResponse
 import requests
 import json
 
-from config.settings import SLACK_CLIENT_ID, SLACK_CLIENT_SECRET
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from slack import WebClient
+from slack.errors import SlackApiError
+
+from config.settings import SLACK_CLIENT_ID, SLACK_CLIENT_SECRET, SLACK_BOT_USER_TOKEN, SLACK_VERIFICATION_TOKEN
 
 
 def index(request: HttpRequest) -> HttpResponse:
@@ -15,6 +21,8 @@ def index(request: HttpRequest) -> HttpResponse:
 
 def oauth(request: HttpRequest) -> HttpResponse:
     """
+    botをワークスペースにインストールする
+
     == Send Request ==
     requests.get(url, {
         "code": "xxx",
@@ -50,3 +58,60 @@ def oauth(request: HttpRequest) -> HttpResponse:
         return HttpResponse('ボットがワークスペースに参加しました！')
     else:
         return HttpResponse('失敗しました！リトライしてね！')
+
+
+client = WebClient(token=SLACK_BOT_USER_TOKEN)
+
+
+class Events(APIView):
+
+    def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        # トークン認証
+        if request.data.get('token') != SLACK_VERIFICATION_TOKEN:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        # Endpoint 認証
+        if request.data.get('type') == 'url_verification':
+            return Response(
+                data=request.data,
+                status=status.HTTP_200_OK
+            )
+
+        # Botのメッセージは除外する
+        if request.data['event'].get('bot_id') is not None:
+            print("Skipped bot message ...")
+            return Response(status=status.HTTP_200_OK)
+
+        # ⇓ ロジック ⇓
+        message_info = request.data.get('event')
+
+        channel = message_info.get('channel')
+        user = message_info.get('user')
+        text = message_info.get('text')
+
+        clear_list = ['おふろチャレンジ成功', 'お風呂チャレンジ成功']
+
+        if text in clear_list:
+            try:
+                client.chat_postMessage(
+                    channel=channel,
+                    text="えらい！！！"
+                )
+            except SlackApiError as e:
+                print(e)
+                return Response("Failed")
+
+            return Response(status=status.HTTP_200_OK)
+        if text == 'おふろチャレンジ失敗':
+            try:
+                client.chat_postMessage(
+                    channel=channel,
+                    text="にゃーん...😿"
+                )
+            except SlackApiError as e:
+                print(e)
+                return Response("Failed")
+
+            return Response(status=status.HTTP_200_OK)
+
+        return Response(status=status.HTTP_200_OK)
