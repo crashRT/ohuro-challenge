@@ -28,6 +28,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env('SECRET_KEY')
 
+SLACK_CLIENT_ID = env('SLACK_CLIENT_ID')
+SLACK_CLIENT_SECRET = env('SLACK_CLIENT_SECRET')
+SLACK_VERIFICATION_TOKEN = env('SLACK_VERIFICATION_TOKEN')
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
