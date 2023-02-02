@@ -10,6 +10,7 @@ from slack import WebClient
 from slack.errors import SlackApiError
 
 from config.settings import SLACK_CLIENT_ID, SLACK_CLIENT_SECRET, SLACK_BOT_USER_TOKEN, SLACK_VERIFICATION_TOKEN
+from .models import ClearHistoryModel
 
 
 def index(request: HttpRequest) -> HttpResponse:
@@ -92,11 +93,14 @@ class Events(APIView):
         clear_list = ['おふろチャレンジ成功', 'お風呂チャレンジ成功']
 
         if text in clear_list:
+            # おふろチャレンジ成功
             try:
                 client.chat_postMessage(
                     channel=channel,
                     text="えらい！！！"
                 )
+                record = ClearHistoryModel(user=user)
+                record.save()
             except SlackApiError as e:
                 print(e)
                 return Response("Failed")
@@ -113,5 +117,15 @@ class Events(APIView):
                 return Response("Failed")
 
             return Response(status=status.HTTP_200_OK)
+        if text == 'おふろチャレンジ記録':
+            try:
+                record = ClearHistoryModel.objects.filter(user=user).count()
+                client.chat_postMessage(
+                    channel=channel,
+                    text=f"おふろチャレンジの記録は{record}回です！"
+                )
+            except SlackApiError as e:
+                print(e)
+                return Response("Failed")
 
         return Response(status=status.HTTP_200_OK)
