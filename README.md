@@ -1,4 +1,4 @@
-# Ohuro-challange
+# Ohuro-challenge
 おふろチャレンジの Slack bot
 
 Slack に「おふろチャレンジ成功」「お風呂チャレンジ成功」と書き込んだら褒めてくれる
