@@ -1,23 +1,11 @@
 version: '3'
-
 services:
-  gunicorn:
+  app: #slack-app
     build: .
-    image: gunicorn:20.1.0
-    container_name: gunicorn
+    container_name: ohuro-challenge-app
     volumes:
-      - .:/usr/src/app/
-      - gunicorn:/var/run/gunicorn
-  nginx:
-    image: nginx:1.17.7
-    container_name: nginx
-    depends_on:
-      - gunicorn
-    ports:
-      - "7020:80"
-    volumes:
-      - ./gunicorn.conf:/etc/nginx/conf.d/default.conf
-      - gunicorn:/var/run/gunicorn
+      - .:/usr/src/app/:cached
+      - ohuro-records:/usr/src/app/sqlite/
+
 volumes:
-  gunicorn:
-    driver: local
+  ohuro-records:
