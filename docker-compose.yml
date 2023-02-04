@@ -5,3 +5,7 @@ services:
     container_name: ohuro-challenge-app
     volumes:
       - .:/usr/src/app/:cached
+      - ohuro-records:/usr/src/app/sqlite/
+
+volumes:
+  ohuro-records:
