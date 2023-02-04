@@ -18,14 +18,14 @@ Slack に「おふろチャレンジ成功」と書き込んだら褒めてく�
 
 1. Socket Mode の Slack アプリを作成し、ワークスペースにインストール、チャンネルに招待する
 
-2. '.env_example' を複製して '.env' に名前を変更
+2. `.env_example` を複製して `.env` に名前を変更
 
-3. '.env' の内容を編集
+3. `.env` の内容を編集
   - SLACK_BOT_TOKEN: Slack のアプリの Bot User OAuth Token
   - SLACK_APP_TOKEN: Slack のアプリの App Level Token
 
 1. 以下のコマンドを実行
 
-'''bash
+```bash
 docker compose up -d
-'''
+```
