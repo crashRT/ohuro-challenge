@@ -24,7 +24,7 @@ Slack に「おふろチャレンジ成功」と書き込んだら褒めてく�
   - SLACK_BOT_TOKEN: Slack のアプリの Bot User OAuth Token
   - SLACK_APP_TOKEN: Slack のアプリの App Level Token
 
-1. 以下のコマンドを実行
+4. 以下のコマンドを実行
 
 ```bash
 docker compose up -d
