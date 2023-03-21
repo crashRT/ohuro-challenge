@@ -6,6 +6,7 @@ services:
     volumes:
       - .:/usr/src/app/:cached
       - ohuro-records:/usr/src/app/sqlite/
+    restart: always
 
 volumes:
   ohuro-records:
