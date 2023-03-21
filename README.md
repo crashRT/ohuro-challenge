@@ -25,16 +25,8 @@ Slack に「おふろチャレンジ成功」と書き込んだら褒めてく�
   - SLACK_BOT_TOKEN: Slack のアプリの Bot User OAuth Token
   - SLACK_APP_TOKEN: Slack のアプリの App Level Token
 
-4. python の仮想環境を作成する
+4. コンテナを起動
 
 ```bash
-$ python3 -m venv .venv
-$ source ./.venv/bin/activate
-$ python3 -m pip install -U pip
-$ pip install -r requirements.txt
-```
-
-5. アプリの起動
-``` bash
-$ nohup python3 app.py &
+$ docker compose up -d
 ```
