@@ -8,6 +8,12 @@ import sqlalchemy as sa
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import sessionmaker
 
+from datetime import datetime
+from dateutil import tz
+
+JST = tz.gettz('Asia/Tokyo')
+UTC = tz.gettz("UTC")
+
 load_dotenv()
 logging.basicConfig(level=logging.DEBUG)
 app = App(token=os.environ.get("SLACK_BOT_TOKEN"))
@@ -57,10 +63,15 @@ def message_progress(message, say):
     # DB から取得
     Session = sessionmaker(bind=conn)
     session = Session()
-    records = session.query(OhuroRecords).filter(OhuroRecords.user == user).all()
+    records_all = session.query(OhuroRecords).filter(OhuroRecords.user == user).all()
+    records_weekly = session.query(OhuroRecords).filter(OhuroRecords.user == user).filter(OhuroRecords.date > sa.func.date(sa.func.now(), '-7 day')).all()
     session.commit()
-    
-    say(f"おふろチャレンジ成功回数は {len(records)} にゃ！")
+
+    say(f"今までのおふろチャレンジ成功回数は {len(records_all)} にゃ！")
+    say(f"1週間の成功記録は以下のとおりにゃ！")
+    for record in records_weekly:
+        say(f" > {record.date.astimezone(JST).strftime('%Y/%m/%d %H:%M')} ")
+    say(f"1週間のおふろチャレンジ成功率は {round(len(records_weekly) / 7 * 100)}% にゃ！")
 
 
 @app.message("にゃーん")
