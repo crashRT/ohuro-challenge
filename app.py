@@ -65,12 +65,13 @@ def message_progress(message, say):
     session = Session()
     records_all = session.query(OhuroRecords).filter(OhuroRecords.user == user).all()
     records_weekly = session.query(OhuroRecords).filter(OhuroRecords.user == user).filter(OhuroRecords.date > sa.func.date(sa.func.now(), '-7 day')).all()
+    formatted_records_weekly = "\n".join([record.date.astimezone(JST).strftime('%m/%d %H:%M') for record in records_weekly])
+
     session.commit()
 
     say(f"今までのおふろチャレンジ成功回数は {len(records_all)} にゃ！")
     say(f"1週間の成功記録は以下のとおりにゃ！")
-    for record in records_weekly:
-        say(f" > {record.date.astimezone(JST).strftime('%Y/%m/%d %H:%M')} ")
+    say(f">>> {formatted_records_weekly}")
     say(f"1週間のおふろチャレンジ成功率は {round(len(records_weekly) / 7 * 100)}% にゃ！")
 
 
