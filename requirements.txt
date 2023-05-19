@@ -1,4 +1,4 @@
 slack_bolt==1.18.0
 python-dotenv==1.0.0
-SQLAlchemy==2.0.13
+SQLAlchemy==2.0.14
 python-dateutil==2.8.2
