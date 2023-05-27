@@ -4,15 +4,18 @@ from slack_sdk import WebClient
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 from dotenv import load_dotenv
+import re
+
 from model import OhuroRecords
 
+OHURO = "(おふろ|お風呂)チャレンジ"
 
 load_dotenv()
 logging.basicConfig(level=logging.DEBUG)
 app = App(token=os.environ.get("SLACK_BOT_TOKEN"))
 
 
-@app.message("おふろチャレンジ成功")
+@app.message(re.compile(OHURO + "成功"))
 def message_clear(message, say):
     user = message["user"]
 
@@ -23,12 +26,12 @@ def message_clear(message, say):
     say("えらいにゃ！！")
 
 
-@app.message("おふろチャレンジ失敗")
+@app.message(re.compile(OHURO + "失敗"))
 def message_fail(message, say):
     say("がんばれにゃ！！")
 
 
-@app.message("おふろチャレンジ進捗")
+@app.message(re.compile(OHURO + "進捗"))
 def message_progress(message, say):
     user = message["user"]
 
