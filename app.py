@@ -4,16 +4,9 @@ from slack_sdk import WebClient
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 from dotenv import load_dotenv
-import sqlalchemy as sa
-from sqlalchemy.orm import declarative_base
-from sqlalchemy.orm import sessionmaker
 import re
 
-from datetime import datetime
-from dateutil import tz
-
-JST = tz.gettz("Asia/Tokyo")
-UTC = tz.gettz("UTC")
+from model import OhuroRecords
 
 OHURO = "(おふろ|お風呂)チャレンジ"
 
@@ -22,40 +15,13 @@ logging.basicConfig(level=logging.DEBUG)
 app = App(token=os.environ.get("SLACK_BOT_TOKEN"))
 
 
-conn = sa.create_engine("sqlite:///sqlite/db.sqlite3")
-
-Base = declarative_base()
-
-
-class OhuroRecords(Base):
-    __tablename__ = "ohuro-records"
-    __table_args__ = {"comment": "お風呂チャレンジの成功記録"}
-
-    id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
-    user = sa.Column(sa.String)
-    date = sa.Column(sa.DateTime, default=sa.func.now())
-
-    def __init__(self, user, date):
-        self.user = user
-        self.date = date
-
-    def __repr__(self):
-        return "<OhuroRecords('%s', '%s')>" % (self.user, self.date)
-
-
-Base.metadata.create_all(conn)
-
-
 @app.message(re.compile(OHURO + "成功"))
 def message_clear(message, say):
     user = message["user"]
 
     # DB に記録
-    record = OhuroRecords(user, sa.func.now())
-    Session = sessionmaker(bind=conn)
-    session = Session()
-    session.add(record)
-    session.commit()
+    record = OhuroRecords(user)
+    record.save_recprd()
 
     say("えらいにゃ！！")
 
@@ -70,23 +36,10 @@ def message_progress(message, say):
     user = message["user"]
 
     # DB から取得
-    Session = sessionmaker(bind=conn)
-    session = Session()
-    records_all = session.query(OhuroRecords).filter(OhuroRecords.user == user).all()
-    records_weekly = (
-        session.query(OhuroRecords)
-        .filter(OhuroRecords.user == user)
-        .filter(OhuroRecords.date > sa.func.date(sa.func.now(), "-7 day"))
-        .all()
-    )
-    formatted_records_weekly = "\n".join(
-        [
-            record.date.astimezone(JST).strftime("%m/%d %H:%M")
-            for record in records_weekly
-        ]
-    )
+    records_all = OhuroRecords.get_all_progress(user)
+    records_weekly = OhuroRecords.get_weekly_progress(user)
 
-    session.commit()
+    formatted_records_weekly = OhuroRecords.format_records(records_weekly)
 
     say(f"今までのおふろチャレンジ成功回数は {len(records_all)} にゃ！")
     say(f"1週間の成功記録は以下のとおりにゃ！")
