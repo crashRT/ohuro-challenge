@@ -29,7 +29,7 @@ class OhuroRecords(Base):
         """
         お風呂チャレンジの成功記録を保存する
         """
-        Session = sessionmaker(bind=conn)
+        Session = sessionmaker(bind=conn, expire_on_commit=False)
         session = Session()
         session.add(self)
         session.commit()
@@ -39,7 +39,7 @@ class OhuroRecords(Base):
         """
         お風呂チャレンジのすべての成功記録を取得する
         """
-        Session = sessionmaker(bind=conn)
+        Session = sessionmaker(bind=conn, expire_on_commit=False)
         session = Session()
         records_all = (
             session.query(OhuroRecords).filter(OhuroRecords.user == user_id).all()
@@ -52,7 +52,7 @@ class OhuroRecords(Base):
         """
         1週間のお風呂チャレンジの成功記録を取得する
         """
-        Session = sessionmaker(bind=conn)
+        Session = sessionmaker(bind=conn, expire_on_commit=False)
         session = Session()
         records_weekly = (
             session.query(OhuroRecords)
