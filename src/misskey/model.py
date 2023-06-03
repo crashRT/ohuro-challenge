@@ -140,5 +140,16 @@ class Users(Base):
         session.commit()
         return users
 
+    @staticmethod
+    def get_user(userid):
+        """
+        ユーザー情報を取得する
+        """
+        Session = sessionmaker(bind=conn, expire_on_commit=False)
+        session = Session()
+        user = session.query(Users).filter(Users.userid == userid).first()
+        session.commit()
+        return user
+
 
 Base.metadata.create_all(conn)

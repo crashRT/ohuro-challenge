@@ -4,8 +4,9 @@ import os
 from dotenv import load_dotenv
 import re
 import requests
+from sqlalchemy.exc import SQLAlchemyError
 
-from model import OhuroRecords
+from model import OhuroRecords, User
 
 try:
     import thread
@@ -17,6 +18,9 @@ load_dotenv()
 USER_TOKEN = os.environ.get("USER_TOKEN")
 
 OHURO = "(おふろ|お風呂)チャレンジ"
+
+reaction_url = "https://misskey.crashrt.work/api/notes/reactions/create"
+headers = {"Content-Type": "application/json"}
 
 
 class Websocket_Client:
@@ -78,9 +82,6 @@ class Websocket_Client:
         noteid = body["id"]
         print("noteid:", noteid)
 
-        reaction_url = "https://misskey.crashrt.work/api/notes/reactions/create"
-        headers = {"Content-Type": "application/json"}
-
         # にゃーん
         if re.compile("にゃーん").match(text):
             reaction_data = {
@@ -111,6 +112,62 @@ class Websocket_Client:
             print(r.status_code)
             print(r.headers)
             print(r.text)
+
+        # ユーザー登録
+        if re.compile(OHURO + "登録").match(text):
+            # DBにユーザーを登録
+            user = User(userid=user["id"], username=user["username"])
+            user.save_user()
+
+            # リアクション
+            reaction_data = {
+                "noteId": noteid,
+                "reaction": ":ok_nya:",
+                "i": USER_TOKEN,
+            }
+            r = requests.post(
+                reaction_url, data=json.dumps(reaction_data), headers=headers
+            )
+
+        # 通知登録
+        if re.compile(OHURO + "通知登録").match(text):
+            try:
+                user = User.get_user(user["userid"])
+                user.subscribe_notify()
+                self.react_ok(noteid)
+            except SQLAlchemyError:
+                # ユーザーが登録されていない場合
+                user = User(userid=user["id"], username=user["username"], notify=True)
+                user.save_user()
+                self.react_ok(noteid)
+            except:
+                self.react_ng(noteid)
+
+        # 通知解除
+        if re.compile(OHURO + "通知解除").match(text):
+            try:
+                user = User.get_user(user["userid"])
+                user.unsubscribe_notify()
+            except SQLAlchemyError:
+                # ユーザーが登録されていない場合
+                user = User(userid=user["id"], username=user["username"], notify=False)
+                user.save_user()
+
+    def react_ok(self, noteid):
+        reaction_data = {
+            "noteId": noteid,
+            "reaction": ":ok_nya:",
+            "i": USER_TOKEN,
+        }
+        r = requests.post(reaction_url, data=json.dumps(reaction_data), headers=headers)
+
+    def react_ng(self, noteid):
+        reaction_data = {
+            "noteId": noteid,
+            "reaction": ":ng_nya:",
+            "i": USER_TOKEN,
+        }
+        r = requests.post(reaction_url, data=json.dumps(reaction_data), headers=headers)
 
 
 HOST_ADDR = "wss://misskey.crashrt.work/streaming?i={}".format(USER_TOKEN)
