@@ -74,4 +74,62 @@ class OhuroRecords(Base):
         )
 
 
+class Users(Base):
+    __tablename__ = "users"
+    __table_args__ = {"comment": "ユーザー情報"}
+
+    id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
+    userid = sa.Column(sa.String, help="ユーザーID")
+    username = sa.Column(sa.String, help="ユーザー名")
+    notify = sa.Column(sa.Boolean, default=True, help="通知設定")
+
+    def __init__(self, userid: str, username: str, notify: bool = False):
+        self.userid = userid
+        self.username = username
+        self.notify = notify
+
+    def __repr__(self):
+        return "<OhuroRecords('%s', '%s')>" % (self.username, self.userid)
+
+    def subscribe_notify(self):
+        """
+        通知設定を有効にする
+        """
+        Session = sessionmaker(bind=conn, expire_on_commit=False)
+        session = Session()
+        self.notify = True
+        session.commit()
+
+    def unsubscribe_notify(self):
+        """
+        通知設定を無効にする
+        """
+        Session = sessionmaker(bind=conn, expire_on_commit=False)
+        session = Session()
+        self.notify = False
+        session.commit()
+
+    @staticmethod
+    def get_all_users():
+        """
+        すべてのユーザー情報を取得する
+        """
+        Session = sessionmaker(bind=conn, expire_on_commit=False)
+        session = Session()
+        users = session.query(Users).all()
+        session.commit()
+        return users
+
+    @staticmethod
+    def get_notify_users():
+        """
+        通知設定が有効なユーザー情報を取得する
+        """
+        Session = sessionmaker(bind=conn, expire_on_commit=False)
+        session = Session()
+        users = session.query(Users).filter(Users.notify == True).all()
+        session.commit()
+        return users
+
+
 Base.metadata.create_all(conn)
