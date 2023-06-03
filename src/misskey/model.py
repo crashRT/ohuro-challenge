@@ -79,9 +79,9 @@ class Users(Base):
     __table_args__ = {"comment": "ユーザー情報"}
 
     id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
-    userid = sa.Column(sa.String, help="ユーザーID")
-    username = sa.Column(sa.String, help="ユーザー名")
-    notify = sa.Column(sa.Boolean, default=True, help="通知設定")
+    userid = sa.Column(sa.String)
+    username = sa.Column(sa.String)
+    notify = sa.Column(sa.Boolean, default=True)
 
     def __init__(self, userid: str, username: str, notify: bool = False):
         self.userid = userid

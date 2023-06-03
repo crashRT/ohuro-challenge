@@ -6,7 +6,7 @@ import re
 import requests
 from sqlalchemy.exc import SQLAlchemyError
 
-from model import OhuroRecords, User
+from model import OhuroRecords, Users
 
 try:
     import thread
@@ -115,8 +115,9 @@ class Websocket_Client:
 
         # ユーザー登録
         if re.compile(OHURO + "登録").match(text):
+            print("ユーザー登録")
             # DBにユーザーを登録
-            user = User(userid=user["id"], username=user["username"])
+            user = Users(userid=user["id"], username=user["username"])
             user.save_user()
 
             # リアクション
@@ -131,13 +132,14 @@ class Websocket_Client:
 
         # 通知登録
         if re.compile(OHURO + "通知登録").match(text):
+            print("通知登録")
             try:
-                user = User.get_user(user["userid"])
+                user = Users.get_user(user["userid"])
                 user.subscribe_notify()
                 self.react_ok(noteid)
             except SQLAlchemyError:
                 # ユーザーが登録されていない場合
-                user = User(userid=user["id"], username=user["username"], notify=True)
+                user = Users(userid=user["id"], username=user["username"], notify=True)
                 user.save_user()
                 self.react_ok(noteid)
             except:
@@ -145,12 +147,13 @@ class Websocket_Client:
 
         # 通知解除
         if re.compile(OHURO + "通知解除").match(text):
+            print("通知解除")
             try:
-                user = User.get_user(user["userid"])
+                user = Users.get_user(user["userid"])
                 user.unsubscribe_notify()
             except SQLAlchemyError:
                 # ユーザーが登録されていない場合
-                user = User(userid=user["id"], username=user["username"], notify=False)
+                user = Users(userid=user["id"], username=user["username"], notify=False)
                 user.save_user()
 
     def react_ok(self, noteid):
