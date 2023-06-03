@@ -25,7 +25,7 @@ class OhuroRecords(Base):
     def __repr__(self):
         return "<OhuroRecords('%s', '%s')>" % (self.user, self.date)
 
-    def save_recprd(self):
+    def save_record(self):
         """
         お風呂チャレンジの成功記録を保存する
         """

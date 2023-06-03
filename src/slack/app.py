@@ -20,7 +20,7 @@ def message_clear(message, say):
 
     # DB に記録
     record = OhuroRecords(user)
-    record.save_recprd()
+    record.save_record()
 
     say("えらいにゃ！！")
 
