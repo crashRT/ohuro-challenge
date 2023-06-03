@@ -1,11 +1,22 @@
 version: '3'
 services:
   slack-app: #slack-app
-    build: .
-    container_name: ohuro-challange-app
+    build:
+      context: .
+      dockerfile: Dockerfile-slack
+    container_name: ohuro-challange-slack
     volumes:
       - ohuro-records:/usr/src/app/sqlite/
+    restart: always
+  misskey-app: #slack-app
+    build:
+      context: .
+      dockerfile: Dockerfile-misskey
+    container_name: ohuro-challange-misskey
+    volumes:
+      - ohuro-records-misskey:/usr/src/app/sqlite/
     restart: always
 
 volumes:
   ohuro-records:
+  ohuro-records-misskey:
