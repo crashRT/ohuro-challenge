@@ -20,6 +20,7 @@ USER_TOKEN = os.environ.get("USER_TOKEN")
 OHURO = "(おふろ|お風呂)チャレンジ"
 
 reaction_url = "https://misskey.crashrt.work/api/notes/reactions/create"
+note_create_url = "https://misskey.crashrt.work/api/notes/create"
 headers = {"Content-Type": "application/json"}
 
 
