@@ -2,6 +2,10 @@ import websocket
 import json
 import os
 from dotenv import load_dotenv
+import re
+import requests
+
+from model import OhuroRecords
 
 try:
     import thread
@@ -11,6 +15,8 @@ import time
 
 load_dotenv()
 USER_TOKEN = os.environ.get("USER_TOKEN")
+
+OHURO = "(おふろ|お風呂)チャレンジ"
 
 
 class Websocket_Client:
@@ -31,7 +37,10 @@ class Websocket_Client:
     # メッセージ受信に呼ばれる関数
     def on_message(self, ws, message):
         loaded_message = json.loads(message)
+        print("##### message #####")
         print(loaded_message)
+        print("##### end message #####")
+        self.ohuro_challange(ws, loaded_message)
 
     # エラー時に呼ばれる関数
     def on_error(self, ws, error):
@@ -56,9 +65,52 @@ class Websocket_Client:
     def connect_localTimeline(self):
         connect_data = {
             "type": "connect",
-            "body": {"channel": "localTimeline", "id": "localTimeline"},
+            "body": {"channel": "localTimeline", "id": "localTimelineId"},
         }
         self.ws.send(json.dumps(connect_data))
+
+    def ohuro_challange(self, ws, message):
+        body = message["body"]["body"]
+        user = body["user"]
+        print("user:", user)
+        text = body["text"]
+        print("text:", text)
+        noteid = body["id"]
+        print("noteid:", noteid)
+
+        reaction_url = "https://misskey.crashrt.work/api/notes/reactions/create"
+        headers = {"Content-Type": "application/json"}
+
+        # にゃーん
+        if re.compile("にゃーん").match(text):
+            reaction_data = {
+                "noteId": noteid,
+                "reaction": "🐱",
+                "i": USER_TOKEN,
+            }
+            r = requests.post(
+                reaction_url, data=json.dumps(reaction_data), headers=headers
+            )
+
+        # おふろチャレンジ成功
+        if re.compile(OHURO + "成功").match(text):
+            # DB に記録
+            record = OhuroRecords(user["username"])
+            record.save_record()
+
+            # リアクション
+            reaction_data = {
+                "noteId": noteid,
+                "reaction": ":nyuuyokuhaigyo:",
+                "i": USER_TOKEN,
+            }
+            r = requests.post(
+                reaction_url, data=json.dumps(reaction_data), headers=headers
+            )
+            print("response:")
+            print(r.status_code)
+            print(r.headers)
+            print(r.text)
 
 
 HOST_ADDR = "wss://misskey.crashrt.work/streaming?i={}".format(USER_TOKEN)
