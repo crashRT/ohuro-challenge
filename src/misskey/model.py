@@ -91,6 +91,15 @@ class Users(Base):
     def __repr__(self):
         return "<OhuroRecords('%s', '%s')>" % (self.username, self.userid)
 
+    def save_user(self):
+        """
+        ユーザー情報を保存する
+        """
+        Session = sessionmaker(bind=conn, expire_on_commit=False)
+        session = Session()
+        session.add(self)
+        session.commit()
+
     def subscribe_notify(self):
         """
         通知設定を有効にする
