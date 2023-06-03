@@ -1,11 +1,14 @@
 import websocket
 import json
+import os
 
 try:
     import thread
 except ImportError:
     import _thread as thread
 import time
+
+USER_TOKEN = os.environ.get("USER_TOKEN")
 
 
 class Websocket_Client:
@@ -55,6 +58,6 @@ class Websocket_Client:
         self.ws.send(json.dumps(connect_data))
 
 
-HOST_ADDR = "wss://misskey.crashrt.work/streaming/"
+HOST_ADDR = "wss://misskey.crashrt.work/streaming?i={}".format(USER_TOKEN)
 ws_client = Websocket_Client(HOST_ADDR)
 ws_client.run_forever()
