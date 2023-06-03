@@ -1,10 +1,9 @@
 version: '3'
 services:
-  app: #slack-app
+  slack-app: #slack-app
     build: .
-    container_name: ohuro-challenge-app
+    container_name: ohuro-challange-app
     volumes:
-      - .:/usr/src/app/:cached
       - ohuro-records:/usr/src/app/sqlite/
     restart: always
 
