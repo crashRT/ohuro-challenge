@@ -134,7 +134,7 @@ class Websocket_Client:
         if re.compile(OHURO + "通知登録").match(text):
             print("通知登録")
             try:
-                user = Users.get_user(user["userid"])
+                user = Users.get_user(user["id"])
                 user.subscribe_notify()
                 self.react_ok(noteid)
             except SQLAlchemyError:
@@ -142,14 +142,12 @@ class Websocket_Client:
                 user = Users(userid=user["id"], username=user["username"], notify=True)
                 user.save_user()
                 self.react_ok(noteid)
-            except:
-                self.react_ng(noteid)
 
         # 通知解除
         if re.compile(OHURO + "通知解除").match(text):
             print("通知解除")
             try:
-                user = Users.get_user(user["userid"])
+                user = Users.get_user(user["id"])
                 user.unsubscribe_notify()
             except SQLAlchemyError:
                 # ユーザーが登録されていない場合
