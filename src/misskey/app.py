@@ -1,6 +1,7 @@
 import websocket
 import json
 import os
+from dotenv import load_dotenv
 
 try:
     import thread
@@ -8,6 +9,7 @@ except ImportError:
     import _thread as thread
 import time
 
+load_dotenv()
 USER_TOKEN = os.environ.get("USER_TOKEN")
 
 
@@ -28,7 +30,8 @@ class Websocket_Client:
 
     # メッセージ受信に呼ばれる関数
     def on_message(self, ws, message):
-        print("receive : {}".format(message))
+        loaded_message = json.loads(message)
+        print(loaded_message)
 
     # エラー時に呼ばれる関数
     def on_error(self, ws, error):
@@ -59,5 +62,6 @@ class Websocket_Client:
 
 
 HOST_ADDR = "wss://misskey.crashrt.work/streaming?i={}".format(USER_TOKEN)
+print(HOST_ADDR)
 ws_client = Websocket_Client(HOST_ADDR)
 ws_client.run_forever()
