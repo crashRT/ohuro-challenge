@@ -5,7 +5,14 @@ from sqlalchemy.orm import sessionmaker
 from datetime import datetime
 from dateutil import tz
 
-conn = sa.create_engine("sqlite:///sqlite/db.sqlite3")
+DATABASE = "mysql://%s:%s@%s/%s?charset=utf8" % (
+    "ohurobot",
+    "ohuro-challange",
+    "0.0.0.0:33066",
+    "ohuro",
+)
+
+conn = sa.create_engine(DATABASE)
 
 Base = declarative_base()
 

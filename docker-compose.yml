@@ -8,6 +8,8 @@ services:
     volumes:
       - ohuro-records:/usr/src/app/sqlite/
     restart: always
+    networks:
+      - ohuro-network
   misskey-app: #slack-app
     build:
       context: .
@@ -16,6 +18,26 @@ services:
     volumes:
       - ohuro-records-misskey:/usr/src/app/sqlite/
     restart: always
+    networks:
+      - ohuro-network
+  mysql:
+    image: mysql:latest
+    container_name: ohuro-challange-mysql
+    ports:
+      - "33066:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ohuro
+      MYSQL_USER: ohurobot
+      MYSQL_PASSWORD: ohuro-challange
+    restart: always
+    networks:
+      - ohuro-network
+
+networks:
+  ohuro-network:
+    driver: bridge
+
 
 volumes:
   ohuro-records:
