@@ -89,7 +89,7 @@ class Users(Base):
         self.notify = notify
 
     def __repr__(self):
-        return "<OhuroRecords('%s', '%s')>" % (self.username, self.userid)
+        return "<Users('%s', '%s', '%s')>" % (self.userid, self.username, self.notify)
 
     def save_user(self):
         """
@@ -107,6 +107,7 @@ class Users(Base):
         Session = sessionmaker(bind=conn, expire_on_commit=False)
         session = Session()
         self.notify = True
+        session.add(self)
         session.commit()
 
     def unsubscribe_notify(self):
@@ -116,6 +117,7 @@ class Users(Base):
         Session = sessionmaker(bind=conn, expire_on_commit=False)
         session = Session()
         self.notify = False
+        session.add(self)
         session.commit()
 
     @staticmethod

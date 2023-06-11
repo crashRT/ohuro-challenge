@@ -4,9 +4,9 @@ WORKDIR /usr/src/app
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-COPY requirements.txt /usr/src/app/
+COPY requirements-misskey.txt /usr/src/app/
 RUN pip3 install --upgrade pip
 RUN pip3 install -r requirements.txt
 COPY ./src/misskey/ /usr/src/app/
 
-CMD ["python3", "app.py"]
+CMD ["sh","startup.sh"]
