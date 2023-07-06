@@ -1,6 +1,6 @@
 slack_bolt==1.18.0
 python-dotenv==1.0.0
-SQLAlchemy==2.0.15
+SQLAlchemy==2.0.18
 python-dateutil==2.8.2
 websocket-client==1.5.2
 requests==2.31.0
